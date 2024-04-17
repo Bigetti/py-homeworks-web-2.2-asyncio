@@ -3,6 +3,8 @@
 import sqlite3
 import db, api
 import asyncio
+import json
+
 
 def insert_character(conn, character):
     cursor = conn.cursor()
@@ -22,15 +24,23 @@ def insert_character(conn, character):
     # Получаем последний автоматически сгенерированный первичный ключ
     character['id'] = cursor.lastrowid
 
+   # Выводим данные персонажа в консоль
+    print(f"Персонаж {character['name']} успешно добавлен в базу данных с id {character['id']}.")
+
+        # Выводим данные персонажа в формате JSON в одну строку в консоль
+    print(json.dumps(character, separators=(',', ':'), ensure_ascii=False))
+
     conn.commit()
 
 async def main():
     db.create_db()
+    print("База данных успешно создана.")
     conn = sqlite3.connect('starwars.db')
 
     try:
         characters = await api.fetch_all_characters()
-
+        print(f"Получено {len(characters)} персонажей.")
+              
         # Проверяем, есть ли исключения в результатах
         for result in characters:
             if isinstance(result, Exception):
@@ -41,6 +51,7 @@ async def main():
         print(f"Произошла ошибка при получении или вставке данных: {e}")
     finally:
         conn.close()
+        print("Соединение с базой данных закрыто.")
 
 if __name__ == '__main__':
     asyncio.run(main())
