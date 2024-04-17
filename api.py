@@ -1,10 +1,18 @@
+
+#api.py
+
+
 import aiohttp
 import asyncio
 
 
 async def fetch_character(session, url):
     async with session.get(url) as response:
-        return await response.json()
+        try:
+            return await response.json()
+        except aiohttp.ContentTypeError:
+            print(f"Ошибка при получении данных с {url}")
+            return None
     
 
 
